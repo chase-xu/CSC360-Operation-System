@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include  <sys/types.h>
+#include <sys/types.h>
 #include <sys/wait.h>
 
 int main(){
@@ -82,6 +82,7 @@ int main(){
 				if(execvp(cmdf[0], cmdf) == -1){
 					perror("child execvp() error!");
 				}
+				return 0;
 			} else if(pid > 0){ /*in parent*/
 				pid_t wt = waitpid(0, NULL, 1);
 				if(wt == -1){
