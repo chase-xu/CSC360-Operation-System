@@ -49,7 +49,7 @@ int main(){
 			cmdf[i++] = tok;
 			tok = strtok(NULL, " ");
 		}
-		for(i = 0; i <3;i++){
+		for(i = 0; i <sizeof(cmdf);i++){
 			printf("%s ", cmdf[i]);
 		}
 		printf("\n");
