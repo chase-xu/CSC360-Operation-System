@@ -62,7 +62,7 @@ int main(){
 		} else if(strcmp(cmdf[0],"cd") == 0){ /* directory cmd*/
 			printf("enter cd");
 			char* path = cmdf[1];
-			if(strcmp(path,"~") == 0 || path.isEmpty() == 1){
+			if(strcmp(path,"~") == 0 || path == NULL || *path == "\0"){
 				if(getenv("HOME") != NULL){
 					if(chdir(path) == -1){
 						perror("chdir() error!");
