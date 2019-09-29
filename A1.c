@@ -57,12 +57,12 @@ int main(){
 		printf("\n");
 
 		/*exit cmd*/
-		if(cmdf[0] == "exit"){  
+		if(strcmp(cmdf[0], "exit") == 0){  
 			exit(0);
-		} else if(cmdf[0] == "cd"){ /* directory cmd*/
+		} else if(strcmp(cmdf[0],"cd") == 0){ /* directory cmd*/
 			printf("enter cd");
 			char* path = cmdf[1];
-			if(path == "~" || path == NULL){
+			if(strcmp(path,"~") == 0 || path == NULL){
 				if(getenv("HOME") != NULL){
 					if(chdir(path) == -1){
 						perror("chdir() error!");
