@@ -53,8 +53,12 @@ int main(){
 			tok = strtok(NULL, " ");
 			j++;
 		}
+<<<<<<< HEAD
 		printf("3\n");
 		for(i = 0; i < j;i++){
+=======
+		for(i = 0; i <sizeof(cmdf);i++){
+>>>>>>> 7594d33063c2d8fa1ae884ecfc779a4d0fb950c1
 			printf("%s ", cmdf[i]);
 		}
 		printf("\n");
@@ -62,10 +66,15 @@ int main(){
 		printf("\n");
 
 		/*exit cmd*/
+<<<<<<< HEAD
 		if(strcmp(cmdf[0], "exit") == 0){  
+=======
+		if(strcmp(cmdf[0], "exit") == 0){ 
+>>>>>>> 7594d33063c2d8fa1ae884ecfc779a4d0fb950c1
 			printf("enter exit\n");
 			exit(0);
-		} else if(strcmp(cmdf[0],"cd") == 0){ /* directory cmd*/
+		} 
+		else if(strcmp(cmdf[0],"cd") == 0){ /* directory cmd*/
 			printf("enter cd");
 			char* path = cmdf[1];
 			if(strcmp(path,"~") == 0 || path == NULL ){
