@@ -53,8 +53,28 @@ int main(){
 			printf("%s ", cmdf[i]);
 		}
 		printf("\n");
-		if(cmdf[0] == "exit"){
+		printf("%s", cmdf[0]);
+		printf("\n");
+
+		/*exit cmd*/
+		if(cmdf[0] == "exit"){  
 			exit(0);
+		} else if(cmdf[0] == "cd"){ /* directory cmd*/
+			printf("enter cd");
+			char* path = cmdf[1];
+			if(path == "~" || path == NULL){
+				if(getenv("HOME") != NULL){
+					if(chdir(path) == -1){
+						perror("chdir() error!");
+					} 
+				}// else{
+				// 	char* dir = getpwuid(getuid())
+				// }	
+			} else {
+				if(chdir(path) == -1){
+					perror("chdir() error!");
+				} 
+			}
 		} else {
 			pid_t pid = fork();
 			/*in child*/
@@ -71,7 +91,6 @@ int main(){
 				}
 			}
 		}
-		break;
 			 
 	}
 	return 0;
