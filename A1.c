@@ -42,14 +42,19 @@ int main(){
 		fgets(cmd, sizeof(cmd), stdin);
 		printf("string is: %s", cmd);
 		strtok(cmd, "\n");
+		printf("1\n");
         char* tok = strtok(cmd, " ");
-		char* cmdf[10];
+		printf("2\n");
+		char* cmdf[100];
 		int i = 0;
+		int j = 0;
 		while( tok != NULL){
 			cmdf[i++] = tok;
 			tok = strtok(NULL, " ");
+			j++;
 		}
-		for(i = 0; i <3;i++){
+		printf("3\n");
+		for(i = 0; i < j;i++){
 			printf("%s ", cmdf[i]);
 		}
 		printf("\n");
@@ -58,11 +63,12 @@ int main(){
 
 		/*exit cmd*/
 		if(strcmp(cmdf[0], "exit") == 0){  
+			printf("enter exit\n");
 			exit(0);
 		} else if(strcmp(cmdf[0],"cd") == 0){ /* directory cmd*/
 			printf("enter cd");
 			char* path = cmdf[1];
-			if(strcmp(path,"~") == 0 || path == NULL || *path == "\0"){
+			if(strcmp(path,"~") == 0 || path == NULL ){
 				if(getenv("HOME") != NULL){
 					if(chdir(path) == -1){
 						perror("chdir() error!");
