@@ -77,19 +77,21 @@ int main(){
 			}
 		} else {
 			pid_t pid = fork();
-			/*in child*/
-			if(pid == 0){
-				if(execvp(cmdf[0], cmdf) == -1){
-					perror("child execvp() error!");
-				}
-				return 0;
-			} else if(pid > 0){ /*in parent*/
+			/*in parent*/
+			if(pid > 0){ 
 				pid_t wt = waitpid(0, NULL, 1);
 				if(wt == -1){
 					perror("parten wt error!");
 				} else{
 					printf("child end success!\n");
 				}
+			}
+			/*in child*/
+			else if(pid == 0){
+				if(execvp(cmdf[0], cmdf) == -1){
+					perror("child execvp() error!");
+				}
+				return 0;
 			}
 		}
 			 
