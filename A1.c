@@ -5,52 +5,20 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+/*linklist constructer
+*Get from lab notes
+*/
 
+typedef struct bg_pro{
+	pid_t pid;
+	char command[1024];
+	struct bg_pro* next;
+}
 
-
-
-
-// void getcmd(){
-// 	/*get command input*/
-//         char cmd[100];
-// 		char* cmdf[100];
-// 		char* tok;
-// 		fgets(cmd, sizeof(cmd), stdin);
-// 		printf("string is: %s", cmd);
-// 		printf("%s", cmd);
-// 		//strtok(cmd, "\n");
-// 		strtok(cmd, "\n");
-// 		tok = strtok(cmd, " ");
-// 		printf("2\n");
-// 		int i = 0;
-// 		int j = 0;
-// 		while(tok != NULL){
-// 			cmdf[i++] = tok;
-// 			tok = strtok(NULL, " ");
-// 			j++;
-// 		}
-// 		printf("%d\n", i);
-
-// 		// //if(strcmp(cmdf[i], "\n")){
-// 		// 	printf("2\n");
-// 		// 	char* s = "\0";
-// 		// 	cmdf[i-1] = s;
-// 		// //}
-// 		// //cmdf[i] = NULL;
-// 		printf("3\n");
-// 		for(i = 0; i < j;i++){
-// 			printf("%s ", cmdf[i]);
-// 		}
-// 		printf("\n");
-// 		printf("%s", cmdf[0]);
-// 		printf("\n");
-// 	return cmdf;
-
-// }
 
 
 int main(){
-
+	/*Get current path*/
 	char buff[1024];
 	if(getcwd(buff, sizeof(buff)) != NULL){
 		printf("current path is %s\n", buff);
@@ -58,6 +26,7 @@ int main(){
 		perror("path error");
 	}
 	
+	/*while loop to process command*/
 	while(1){
 		char buff[1024];
 		char hstname[1024]; 
@@ -86,8 +55,9 @@ int main(){
 		fgets(cmd, sizeof(cmd), stdin);
 		printf("string is: %s", cmd);
 		printf("%s", cmd);
-		//strtok(cmd, "\n");
 		strtok(cmd, "\n");
+
+		/*tokenize input*/
 		tok = strtok(cmd, " ");
 		printf("2\n");
 		int i = 0;
@@ -105,13 +75,14 @@ int main(){
 		printf("\n");
 		printf("%s", cmdf[0]);
 		printf("\n");
+
 		/*exit cmd*/
 		if(strcmp(cmdf[0], "exit") == 0){
 			exit(0);
 		}
 		
-
-		if(strcmp(cmdf[0], "cd") == 0){ /* directory cmd*/
+		/* directory cmd*/
+		if(strcmp(cmdf[0], "cd") == 0){ 
 			printf("enter cd\n");
 			printf("path is %s\n", cmdf[1]);
 			if(cmdf[1] == NULL){
@@ -132,6 +103,28 @@ int main(){
 			}
 			//free(path);
 		}
+		/*background command*/
+		if(strcmp(cmdf[0], "bg") == 0){
+			pid_t pid = fork();
+						/*in parent*/
+			if(pid > 0){ 
+				pid_t wt = waitpid(0, NULL, 1);
+				if(wt == -1){
+					perror("parten wt error!");
+				} else{
+					printf("child end success!\n");
+				}
+				continue;
+			}
+			/*in child*/
+			else if(pid == 0){
+				if(execvp(cmdf[0], cmdf) == -1){
+					perror("child execvp() error!");
+				}
+				return 0;
+			}
+
+		}
 	    else {
 			pid_t pid = fork();
 			/*in parent*/
@@ -146,7 +139,7 @@ int main(){
 			}
 			/*in child*/
 			else if(pid == 0){
-				if(execvp(cmdf[0], cmdf) == -1){
+				if(execvp(cmdf[1], &cmdf[1]) == -1){
 					perror("child execvp() error!");
 				}
 				return 0;
