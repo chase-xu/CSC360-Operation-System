@@ -5,6 +5,50 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+
+
+
+
+
+// void getcmd(){
+// 	/*get command input*/
+//         char cmd[100];
+// 		char* cmdf[100];
+// 		char* tok;
+// 		fgets(cmd, sizeof(cmd), stdin);
+// 		printf("string is: %s", cmd);
+// 		printf("%s", cmd);
+// 		//strtok(cmd, "\n");
+// 		strtok(cmd, "\n");
+// 		tok = strtok(cmd, " ");
+// 		printf("2\n");
+// 		int i = 0;
+// 		int j = 0;
+// 		while(tok != NULL){
+// 			cmdf[i++] = tok;
+// 			tok = strtok(NULL, " ");
+// 			j++;
+// 		}
+// 		printf("%d\n", i);
+
+// 		// //if(strcmp(cmdf[i], "\n")){
+// 		// 	printf("2\n");
+// 		// 	char* s = "\0";
+// 		// 	cmdf[i-1] = s;
+// 		// //}
+// 		// //cmdf[i] = NULL;
+// 		printf("3\n");
+// 		for(i = 0; i < j;i++){
+// 			printf("%s ", cmdf[i]);
+// 		}
+// 		printf("\n");
+// 		printf("%s", cmdf[0]);
+// 		printf("\n");
+// 	return cmdf;
+
+// }
+
+
 int main(){
 
 	char buff[1024];
@@ -16,9 +60,7 @@ int main(){
 	
 	while(1){
 		char buff[1024];
-		//char usenam[1024];
 		char hstname[1024]; 
-		//usenam = getlogin();
 		if(getlogin() == NULL){
 			perror("getlogin() error!");
 			continue;
@@ -35,24 +77,27 @@ int main(){
 		}else{
                 	perror("path error");
 			continue;
-       	 	}
+       	}
 
 		/*get command input*/
         char cmd[100];
+		char* cmdf[100];
+		char* tok;
 		fgets(cmd, sizeof(cmd), stdin);
 		printf("string is: %s", cmd);
+		printf("%s", cmd);
+		//strtok(cmd, "\n");
 		strtok(cmd, "\n");
-		printf("1\n");
-        char* tok = strtok(cmd, " ");
+		tok = strtok(cmd, " ");
 		printf("2\n");
-		char* cmdf[100];
 		int i = 0;
 		int j = 0;
-		while( tok != NULL){
+		while(tok != NULL){
 			cmdf[i++] = tok;
 			tok = strtok(NULL, " ");
 			j++;
 		}
+		printf("%d\n", i);
 		printf("3\n");
 		for(i = 0; i < j;i++){
 			printf("%s ", cmdf[i]);
@@ -60,31 +105,34 @@ int main(){
 		printf("\n");
 		printf("%s", cmdf[0]);
 		printf("\n");
-
-		printf("%s", typeof(cmdf[0]));	
-                printf(*cmdf[0]);
 		/*exit cmd*/
-		if(strcmp(*cmdf[0], "exit") == 0){  
-			printf("enter exit\n");
+		if(strcmp(cmdf[0], "exit") == 0){
 			exit(0);
-		} 
-		if(strcmp(*cmdf[0],"cd") == 0){ /* directory cmd*/
-			printf("enter cd");
-			char* path = cmdf[1];
-			if(strcmp(*cmdf[1],"~") == 0 || *cmdf[1] == NULL){
+		}
+		
+
+		if(strcmp(cmdf[0], "cd") == 0){ /* directory cmd*/
+			printf("enter cd\n");
+			printf("path is %s\n", cmdf[1]);
+			if(cmdf[1] == NULL){
+				printf("find null \n");
+			}
+			if(cmdf[1] == NULL || strcmp(cmdf[1],"~") == 0){
+				printf("enter path\n");
+				char dir[strlen(getenv("HOME"))];
 				if(getenv("HOME") != NULL){
-					if(chdir(path) == -1){
+					if(chdir(strcpy(dir, getenv("HOME"))) == -1){
 						perror("chdir() error!");
 					} 
-				}// else{
-				// 	char* dir = getpwuid(getuid())
-				// }	
+				}
 			} else {
-				if(chdir(path) == -1){
+				if(chdir(cmdf[1]) == -1){
 					perror("chdir() error!");
 				} 
 			}
-		} else {
+			//free(path);
+		}
+	    else {
 			pid_t pid = fork();
 			/*in parent*/
 			if(pid > 0){ 
@@ -94,6 +142,7 @@ int main(){
 				} else{
 					printf("child end success!\n");
 				}
+				continue;
 			}
 			/*in child*/
 			else if(pid == 0){
@@ -103,7 +152,9 @@ int main(){
 				return 0;
 			}
 		}
+	// 	free(cmd);
 			 
+	// }
 	}
 	return 0;
 }
