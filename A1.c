@@ -13,26 +13,40 @@ typedef struct bg{
 	pid_t pid;
 	char* cmd;
 	struct bg* next;
-}
+} bg;
 
-bg* first = NULL;
-void append(bg* list, pid_t pid, char* cmd){
+
+/*point list to null which is the first node in the linklist*/
+bg* list = NULL;
+void append(pid_t pid, char* cmd){
+	/*create a node that is going to be appended*/
 	bg* curr = (bg*) malloc(sizeof(bg));
 	curr->pid = pid;
 	curr->cmd = cmd;
+	/*check if it is the first node*/
 	if(list == NULL){
 		list = curr;
 		list->next = NULL;
 	}
 	else{
-		bg* temp = first; 
+		bg* temp = list; 
 		while(temp->next != NULL){
 			temp = temp->next;
 		}
 		temp->next = curr;
-		list = 
-		
+		temp->next->next = NULL;
 	} 
+}
+
+/*Delete node*/
+void delete(pid_t pid){
+	bg* curr = list;
+	while(curr->next != NULL){
+		if(curr->next == NULL && curr->pid == pid){
+			curr = NULL;
+		}
+		else if()
+	}
 }
 
 
