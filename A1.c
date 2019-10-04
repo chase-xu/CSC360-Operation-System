@@ -9,12 +9,31 @@
 *Get from lab notes
 */
 
-typedef struct bg_pro{
+typedef struct bg{
 	pid_t pid;
-	char command[1024];
-	struct bg_pro* next;
+	char* cmd;
+	struct bg* next;
 }
 
+bg* first = NULL;
+void append(bg* list, pid_t pid, char* cmd){
+	bg* curr = (bg*) malloc(sizeof(bg));
+	curr->pid = pid;
+	curr->cmd = cmd;
+	if(list == NULL){
+		list = curr;
+		list->next = NULL;
+	}
+	else{
+		bg* temp = first; 
+		while(temp->next != NULL){
+			temp = temp->next;
+		}
+		temp->next = curr;
+		list = 
+		
+	} 
+}
 
 
 int main(){
@@ -79,6 +98,21 @@ int main(){
 		/*exit cmd*/
 		if(strcmp(cmdf[0], "exit") == 0){
 			exit(0);
+		}
+
+		/*bg command*/
+		if(strcmp(cmdf[0], "bg") == 0){
+			pid_t pit = fork();
+			/*create a child*/
+			if(pit == 0){
+				if(execvp(cmdf[1], &cmdf[1]) == -1){
+					perror("child execvp() error!");
+				}
+				else {
+
+				}
+				return 0;
+			}
 		}
 		
 		/* directory cmd*/
