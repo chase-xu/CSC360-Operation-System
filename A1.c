@@ -39,14 +39,40 @@ void append(pid_t pid, char* cmd){
 }
 
 /*Delete node*/
-void delete(pid_t pid){
+char* delete(pid_t pid){
 	bg* curr = list;
-	while(curr->next != NULL){
-		if(curr->next == NULL && curr->pid == pid){
-			curr = NULL;
-		}
-		else if()
+	char* cmd;
+	/*case if the list is empty*/
+	if(list == NULL){
+		perror("list is empty!");
 	}
+	/*Go through list to find same pid*/
+	while(1){
+		/*case if the first or the last node is the pid*/
+		if(curr->pid == pid){
+			if(curr->next == NULL){
+				strcpy(cmd, curr->cmd);
+				free(curr);
+				curr = NULL;
+				break;
+			}
+		}
+		/*case if the pid is not the first nor last node*/
+		else if(curr->next->next != NULL && curr->next->pid == pid){
+			bg* temp = curr->next;
+			temp = curr->next->next;
+			cmd = temp->cmd;
+			free(temp);
+			break;
+		}
+		/*go check next node*/
+		curr = curr->next;
+		if(curr == NULL){
+			perror("NO matching pid id");
+			break;
+		}
+	}
+	return cmd;
 }
 
 
@@ -73,11 +99,11 @@ int main(){
 			continue;
 		}
 	
-       	 	if(getcwd(buff, sizeof(buff)) != NULL){
-                	printf("SSI: %s@%s: %s > ", getlogin(), hstname, buff);
+       	if(getcwd(buff, sizeof(buff)) != NULL){
+            printf("SSI: %s@%s: %s > ", getlogin(), hstname, buff);
 
 		}else{
-                	perror("path error");
+            perror("path error");
 			continue;
        	}
 
@@ -109,26 +135,20 @@ int main(){
 		printf("%s", cmdf[0]);
 		printf("\n");
 
+		/*check if any child terminated*/
+		if(len(cmdf) != 0){
+			pid_t pid;
+			while(pid = waitpid(0, NULL, 1) > 0){
+				char* cmd = pid->cmd;
+				delete(pid);
+				printf("%d: %s has terminated.\n", pid, );
+			}
+		}
 		/*exit cmd*/
-		if(strcmp(cmdf[0], "exit") == 0){
+		if(strcmp(cmdf[0], "quit") == 0){
 			exit(0);
 		}
 
-		/*bg command*/
-		if(strcmp(cmdf[0], "bg") == 0){
-			pid_t pit = fork();
-			/*create a child*/
-			if(pit == 0){
-				if(execvp(cmdf[1], &cmdf[1]) == -1){
-					perror("child execvp() error!");
-				}
-				else {
-
-				}
-				return 0;
-			}
-		}
-		
 		/* directory cmd*/
 		if(strcmp(cmdf[0], "cd") == 0){ 
 			printf("enter cd\n");
@@ -154,14 +174,9 @@ int main(){
 		/*background command*/
 		if(strcmp(cmdf[0], "bg") == 0){
 			pid_t pid = fork();
-						/*in parent*/
+			/*in parent*/
 			if(pid > 0){ 
-				pid_t wt = waitpid(0, NULL, 1);
-				if(wt == -1){
-					perror("parten wt error!");
-				} else{
-					printf("child end success!\n");
-				}
+				append(pid, cmdf);
 				continue;
 			}
 			/*in child*/
@@ -171,7 +186,6 @@ int main(){
 				}
 				return 0;
 			}
-
 		}
 	    else {
 			pid_t pid = fork();
@@ -193,9 +207,6 @@ int main(){
 				return 0;
 			}
 		}
-	// 	free(cmd);
-			 
-	// }
 	}
 	return 0;
 }
