@@ -92,30 +92,20 @@ void delete(pid_t pid){
 	/*first one matched*/
 	else if(list->pid == pid){
 		list = list->next;
-		printf("%d: %s has terminated.\n", pid, temp->cmd);
+		printf("%d: %s has terminated.\n", pid, prev->cmd);
 		free(prev->cmd);
 		free(prev);
 	}
 	/*Go through list to find same pid*/
 	else{
 		while(curr != NULL){
-			/*case if the last node is the pid*/
+			/*case find the pid*/
 			if(curr->pid == pid){
 					prev->next = curr->next;
 					printf("%d: %s has terminated.\n", pid, curr->cmd);
 					free(curr->cmd);
 					free(curr);
 					break;
-			}
-			/*case if the pid is not the first nor last node*/
-			else if(curr->next->next != NULL && ->next->pid == pid){
-				bg* temp = curr->next;
-				temp = curr->next->next;
-				cmd = temp->cmd;
-				printf("%d: %s has terminated.\n", pid, temp->cmd);
-				free(temp->cmd);
-				free(temp);
-				break;
 			}
 			/*go check next node*/
 			prev = curr;
