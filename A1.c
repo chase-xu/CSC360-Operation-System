@@ -5,24 +5,41 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+
+
+/*constants*/
+#define CMDSIZE 25
 /*linklist constructer
 *Get from lab notes
 */
 
 typedef struct bg{
+	struct bg* next;
 	pid_t pid;
 	char* cmd;
-	struct bg* next;
 } bg;
 
 
 /*point list to null which is the first node in the linklist*/
 bg* list = NULL;
-void append(pid_t pid, char* cmd){
+void append(pid_t pid, char* cmdf[]){
 	/*create a node that is going to be appended*/
 	bg* curr = (bg*) malloc(sizeof(bg));
+	printf("in append\n");
+	char* cmdc = (char*) malloc(sizeof(char)*25);
+	int i = 0;
+	printf("cmd is %s\n", cmdf[0]);
+	while(cmdf[i] != NULL){
+		strcpy(cmdc, cmdf[i]);
+		strcpy(cmdc, " ");
+	 	//printf("%s ", cmdf[i]);
+		i++;
+	}
+	strcpy(cmdc, "\0");
+	printf("%s\n", cmdc);
+	printf("passed concat\n");
 	curr->pid = pid;
-	curr->cmd = cmd;
+	curr->cmd = cmdc;
 	/*check if it is the first node*/
 	if(list == NULL){
 		list = curr;
@@ -36,6 +53,29 @@ void append(pid_t pid, char* cmd){
 		temp->next = curr;
 		temp->next->next = NULL;
 	} 
+}
+
+int isEmpty(){
+	if(list == NULL){
+		return 1;
+	}
+	return 0;
+}
+
+void printList(){
+	printf("in print list\n");
+	int n = 0;
+	bg* curr = list;
+	printf("passed concatenation\n");
+	if(list == NULL){
+		perror("no bg in the list\n");
+	}
+	while(curr != NULL){
+		n++;
+		printf("%d: %s %d\n", curr->pid, curr->cmd, n);
+		curr = curr->next;
+	}
+	printf("Total Background jobs: %d\n", n);
 }
 
 /*Delete node*/
@@ -108,8 +148,9 @@ int main(){
        	}
 
 		/*get command input*/
-        char cmd[100];
-		char* cmdf[100];
+        char cmd[CMDSIZE];
+		//char** cmdf = (char**) malloc(sizeof(char));
+		char* cmdf[CMDSIZE];
 		char* tok;
 		fgets(cmd, sizeof(cmd), stdin);
 		printf("string is: %s", cmd);
@@ -136,21 +177,20 @@ int main(){
 		printf("\n");
 
 		/*check if any child terminated*/
-		if(len(cmdf) != 0){
-			pid_t pid;
-			while(pid = waitpid(0, NULL, 1) > 0){
-				char* cmd = pid->cmd;
-				delete(pid);
-				printf("%d: %s has terminated.\n", pid, );
-			}
-		}
+		// if(isEmpty() != 0){
+		// 	pid_t pid;
+		// 	while(pid = waitpid(0, NULL, 1) > 0){
+		// 		printf("in pid");
+		// 		char* cmd_ = delete(pid);
+		// 		printf("%d: %s has terminated.\n", pid, cmd_);
+		// 	}
+		// }
 		/*exit cmd*/
 		if(strcmp(cmdf[0], "quit") == 0){
 			exit(0);
 		}
-
 		/* directory cmd*/
-		if(strcmp(cmdf[0], "cd") == 0){ 
+		else if(strcmp(cmdf[0], "cd") == 0){ 
 			printf("enter cd\n");
 			printf("path is %s\n", cmdf[1]);
 			if(cmdf[1] == NULL){
@@ -172,20 +212,37 @@ int main(){
 			//free(path);
 		}
 		/*background command*/
-		if(strcmp(cmdf[0], "bg") == 0){
+		else if(strcmp(cmdf[0], "bg") == 0){
+			
+			/*abandon first cmd "bg"*/
+			char* cmdbg[CMDSIZE];
+			int i = 0;
+			printf("size of cmdf is %d\n",(int) sizeof(cmdf));
+			while(cmdf[i+1] != NULL){
+				cmdbg[i] = cmdf[i+1];
+				printf("%s ", cmdbg[i]);
+				i++;
+			}
+			printf("\n");
+			printf("passed copy\n");
 			pid_t pid = fork();
 			/*in parent*/
 			if(pid > 0){ 
-				append(pid, cmdf);
+				append(pid, cmdbg);             
 				continue;
 			}
 			/*in child*/
 			else if(pid == 0){
-				if(execvp(cmdf[0], cmdf) == -1){
+				printf("cmdbg[0] is %s\n", cmdbg[0]);
+				if(execvp(cmdbg[0], cmdbg) == -1){
 					perror("child execvp() error!");
 				}
 				return 0;
 			}
+		}
+		/*print bglist*/
+		else if(strcmp(cmdf[0], "bglist") == 0){
+			printList(cmdf);
 		}
 	    else {
 			pid_t pid = fork();
@@ -201,12 +258,13 @@ int main(){
 			}
 			/*in child*/
 			else if(pid == 0){
-				if(execvp(cmdf[1], &cmdf[1]) == -1){
+				if(execvp(cmdf[0], cmdf) == -1){
 					perror("child execvp() error!");
 				}
 				return 0;
 			}
 		}
 	}
+	//free(cmdf);
 	return 0;
 }
