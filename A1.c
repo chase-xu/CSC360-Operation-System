@@ -22,24 +22,25 @@ typedef struct bg{
 
 /*point list to null which is the first node in the linklist*/
 bg* list = NULL;
-void append(pid_t pid, char* cmdf[]){
+void append(pid_t pid, char** cmdf){
 	/*create a node that is going to be appended*/
 	bg* curr = (bg*) malloc(sizeof(bg));
 	printf("in append\n");
-	char* cmdc = (char*) malloc(sizeof(char)*25);
+	char* cmdc = (char*) malloc(sizeof(char)*50);
 	int i = 0;
 	printf("cmd is %s\n", cmdf[0]);
+	
+	char* space = " ";
 	while(cmdf[i] != NULL){
-		strcpy(cmdc, cmdf[i]);
-		strcpy(cmdc, " ");
-	 	//printf("%s ", cmdf[i]);
+		strcat(cmdc, cmdf[i]);
+		strcat(cmdc, " ");
 		i++;
 	}
-	strcpy(cmdc, "\0");
 	printf("%s\n", cmdc);
 	printf("passed concat\n");
 	curr->pid = pid;
-	curr->cmd = cmdc;
+	curr->cmd = &cmdc[0];
+	printf("cmd is %s\n", curr->cmd);
 	/*check if it is the first node*/
 	if(list == NULL){
 		list = curr;
@@ -72,7 +73,7 @@ void printList(){
 	}
 	while(curr != NULL){
 		n++;
-		printf("%d: %s %d\n", curr->pid, curr->cmd, n);
+		printf("%d: %s%d\n", curr->pid, curr->cmd, n);
 		curr = curr->next;
 	}
 	printf("Total Background jobs: %d\n", n);
@@ -177,14 +178,14 @@ int main(){
 		printf("\n");
 
 		/*check if any child terminated*/
-		// if(isEmpty() != 0){
-		// 	pid_t pid;
-		// 	while(pid = waitpid(0, NULL, 1) > 0){
-		// 		printf("in pid");
-		// 		char* cmd_ = delete(pid);
-		// 		printf("%d: %s has terminated.\n", pid, cmd_);
-		// 	}
-		// }
+		if(isEmpty() != 0){
+			pid_t pid;
+			while(pid = waitpid(0, NULL, 1) > 0){
+				printf("in pid");
+				char* cmd_ = delete(pid);
+				printf("%d: %s has terminated.\n", pid, cmd_);
+			}
+		}
 		/*exit cmd*/
 		if(strcmp(cmdf[0], "quit") == 0){
 			exit(0);
