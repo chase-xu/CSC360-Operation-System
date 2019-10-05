@@ -178,7 +178,7 @@ int main(){
 		printf("\n");
 
 		/*check if any child terminated*/
-		if(isEmpty() != 0){
+		if(isEmpty() == 0){
 			pid_t pid;
 			while(pid = waitpid(0, NULL, 1) > 0){
 				printf("in pid");
