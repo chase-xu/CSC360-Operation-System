@@ -80,40 +80,51 @@ void printList(){
 }
 
 /*Delete node*/
-char* delete(pid_t pid){
-	bg* curr = list;
+void delete(pid_t pid){
 	char* cmd;
+	bg* curr = list->next;
+	bg* prev = list;
 	/*case if the list is empty*/
 	if(list == NULL){
 		perror("list is empty!");
 	}
+
+	/*first one matched*/
+	else if(list->pid == pid){
+		list = list->next;
+		printf("%d: %s has terminated.\n", pid, temp->cmd);
+		free(prev->cmd);
+		free(prev);
+	}
 	/*Go through list to find same pid*/
-	while(1){
-		/*case if the first or the last node is the pid*/
-		if(curr->pid == pid){
-			if(curr->next == NULL){
-				strcpy(cmd, curr->cmd);
-				free(curr);
-				curr = NULL;
+	else{
+		while(curr != NULL){
+			/*case if the last node is the pid*/
+			if(curr->pid == pid){
+					prev->next = curr->next;
+					printf("%d: %s has terminated.\n", pid, curr->cmd);
+					free(curr->cmd);
+					free(curr);
+					break;
+			}
+			/*case if the pid is not the first nor last node*/
+			else if(curr->next->next != NULL && ->next->pid == pid){
+				bg* temp = curr->next;
+				temp = curr->next->next;
+				cmd = temp->cmd;
+				printf("%d: %s has terminated.\n", pid, temp->cmd);
+				free(temp->cmd);
+				free(temp);
 				break;
 			}
+			/*go check next node*/
+			prev = curr;
+			curr = curr->next;
 		}
-		/*case if the pid is not the first nor last node*/
-		else if(curr->next->next != NULL && curr->next->pid == pid){
-			bg* temp = curr->next;
-			temp = curr->next->next;
-			cmd = temp->cmd;
-			free(temp);
-			break;
-		}
-		/*go check next node*/
-		curr = curr->next;
 		if(curr == NULL){
-			perror("NO matching pid id");
-			break;
+			perror("not found pid\n");
 		}
 	}
-	return cmd;
 }
 
 
@@ -182,8 +193,7 @@ int main(){
 			pid_t pid;
 			while(pid = waitpid(0, NULL, 1) > 0){
 				printf("in pid");
-				char* cmd_ = delete(pid);
-				printf("%d: %s has terminated.\n", pid, cmd_);
+				delete(pid);
 			}
 		}
 		/*exit cmd*/
