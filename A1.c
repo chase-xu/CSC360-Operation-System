@@ -27,7 +27,7 @@ void append(pid_t pid, char** cmdf){
 	/*create a node that is going to be appended*/
 	bg* curr = (bg*) malloc(sizeof(bg));
 	printf("in append\n");
-	char* cmdc = (char*) malloc(sizeof(char)*50);
+	char* cmdc = (char*) malloc(sizeof(char)*70);
 	int i = 0;
 	printf("cmd is %s\n", cmdf[0]);
 	while(cmdf[i] != NULL){
@@ -38,7 +38,8 @@ void append(pid_t pid, char** cmdf){
 	printf("%s\n", cmdc);
 	printf("passed concat\n");
 	curr->pid = pid;
-	curr->cmd = &cmdc[0];
+	curr->cmd = "";
+	strcat(curr->cmd, cmdc);
 	printf("cmd is %s\n", curr->cmd);
 	/*check if it is the first node*/
 	if(list == NULL){
@@ -195,7 +196,7 @@ int main(){
 			tok = strtok(NULL, " ");
 			j++;
 		}
-		cmdf[1] = strtok(cmdf[1], " ");  //not sure why if the input has cd and + space, the space will remains. So I just use this line to delete the space;
+		cmdf[1] = strtok(cmdf[1], " ");  //not sure why if the input is cd and + space, after tokenize the space will remains. So I just use this line to delete the space;
 		printf("%d\n", i);
 		printf("3\n");
 		for(i = 0; i < j;i++){
