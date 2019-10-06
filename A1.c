@@ -27,17 +27,17 @@ void append(pid_t pid, char** cmdf){
 	/*create a node that is going to be appended*/
 	bg* curr = (bg*) malloc(sizeof(bg));
 	curr->cmd = (char*) malloc(sizeof(char)*CMDSIZE);
-	printf("in append\n");
+	//printf("in append\n");
 	char* cmdc = (char*) malloc(sizeof(char)*70);
 	int i = 0;
-	printf("cmd is %s\n", cmdf[0]);
+	//printf("cmd is %s\n", cmdf[0]);
 	while(cmdf[i] != NULL){
 		strcat(cmdc, cmdf[i]);
 		strcat(cmdc, " ");
 		i++;
 	}
-	printf("%s\n", cmdc);
-	printf("passed concat\n");
+	//printf("%s\n", cmdc);
+	//printf("passed concat\n");
 	curr->pid = pid;
 	//strcat(curr->cmd, cmdc);
 	curr->cmd = cmdc;
@@ -175,12 +175,9 @@ int main(){
        	}
 
 		/*get command input*/
-        //char* cmd = (char*)malloc(sizeof(char)*CMDSIZE);
-		//char argv[CMDSIZE];
-		//char** cmdf = (char**) malloc(sizeof(char));
 		char cmd[CMDSIZE];
 		char* cmdf[CMDSIZE];
-		
+
 		printf("string is: %s\n", cmd);
 		printf("%s", cmd);
 
@@ -189,15 +186,21 @@ int main(){
 		fgets(cmd, sizeof(cmd), stdin);
 		strtok(cmd, "\n");
 		printf("%s\n", cmd);
+		if(cmd[0] == '\0'|| cmd[0] == '\n'){
+			continue;
+		}
 		int i = 0;
 		int j = 0;
 		tok = strtok(cmd, " ");
 		while(tok != NULL){
-			cmdf[i++] = tok;
+			cmdf[i] = tok;
 			tok = strtok(NULL, " ");
+			i++;
 			j++;
 		}
-		cmdf[1] = strtok(cmdf[1], " ");  //not sure why if the input is cd and + space, after tokenize the space will remains. So I just use this line to delete the space;
+		
+		cmdf[i] = NULL;
+		//cmdf[1] = strtok(cmdf[1], " ");  //not sure why if the input is cd and + space, after tokenize the space will remains. So I just use this line to delete the space;
 		printf("%d\n", i);
 		printf("3\n");
 		for(i = 0; i < j;i++){
@@ -241,13 +244,21 @@ int main(){
 			check_list();
 
 			/*abandon first cmd "bg"*/
-			char* cmdbg[CMDSIZE];
+			char** cmdbg = (char**)malloc(sizeof(char**)*CMDSIZE);
+
 			int i = 0;
+			int j = 1;
+			printf("first argv of cmdf is %s\n", cmdf[2]);
 			printf("size of cmdf is %d\n",(int) sizeof(cmdf));
-			while(cmdf[i+1] != NULL){
-				cmdbg[i] = cmdf[i+1];
+			while(cmdf[j] != NULL){
+				printf("in cat loop\n");
+				// char str[CMDSIZE];
+				// str = cmdf[j]; 
+				//strcpy(cmdbg[i], cmdf[j]);
+				cmdbg[i] = cmdf[j];
 				printf("%s ", cmdbg[i]);
 				i++;
+				j++;
 			}
 			printf("\n");
 			printf("passed copy\n");
@@ -260,7 +271,7 @@ int main(){
 			/*in child*/
 			else if(pid == 0){
 				printf("cmdbg[0] is %s\n", cmdbg[0]);
-				if(execvp(cmdbg[0], cmdbg) == -1){
+				if(execvp(cmdbg[0], &cmdbg[0]) == -1){
 					perror("child execvp() error!");
 				}
 				return 0;
@@ -271,24 +282,27 @@ int main(){
 			printList(cmdf);
 		}
 	    else {
-			check_list();
-			pid_t pid = fork();
+			printf("in comman command\n");
+			//check_list();
+			pid_t p = fork();
+			printf("p is %d", p);
+			/*in child*/
+			if(p == 0){
+				printf("cmdf is %s %s",cmdf[0], cmdf[1]);
+				if(execvp(cmdf[0], &cmdf[0]) == -1){
+					perror("child execvp() error!");
+				}
+				return 0;
+			}
 			/*in parent*/
-			if(pid > 0){ 
-				pid_t wt = waitpid(0, NULL, 1);
+			else if(p > 0){ 
+				pid_t wt = waitpid(p, NULL, 1);
 				if(wt == -1){
 					perror("parten wt error!");
 				} else{
 					printf("child end success!\n");
 				}
 				continue;
-			}
-			/*in child*/
-			else if(pid == 0){
-				if(execvp(cmdf[0], cmdf) == -1){
-					perror("child execvp() error!");
-				}
-				return 0;
 			}
 		}
 	}
