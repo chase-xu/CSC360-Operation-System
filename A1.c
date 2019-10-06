@@ -26,6 +26,7 @@ bg* list = NULL;
 void append(pid_t pid, char** cmdf){
 	/*create a node that is going to be appended*/
 	bg* curr = (bg*) malloc(sizeof(bg));
+	curr->cmd = (char*) malloc(sizeof(char)*CMDSIZE);
 	printf("in append\n");
 	char* cmdc = (char*) malloc(sizeof(char)*70);
 	int i = 0;
@@ -38,8 +39,8 @@ void append(pid_t pid, char** cmdf){
 	printf("%s\n", cmdc);
 	printf("passed concat\n");
 	curr->pid = pid;
-	curr->cmd = "";
-	strcat(curr->cmd, cmdc);
+	//strcat(curr->cmd, cmdc);
+	curr->cmd = cmdc;
 	printf("cmd is %s\n", curr->cmd);
 	/*check if it is the first node*/
 	if(list == NULL){
