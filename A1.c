@@ -8,7 +8,7 @@
 
 
 /*constants*/
-#define CMDSIZE 25
+#define CMDSIZE 50
 /*linklist constructer
 *Get from lab notes
 */
@@ -27,7 +27,7 @@ void append(pid_t pid, char** cmdf){
 	/*create a node that is going to be appended*/
 	bg* curr = (bg*) malloc(sizeof(bg));
 	curr->cmd = (char*) malloc(sizeof(char)*CMDSIZE);
-	char* cmdc = (char*) malloc(sizeof(char)*70);
+	char* cmdc = (char*) malloc(sizeof(char)*CMDSIZE);
 	int i = 0;
 	while(cmdf[i] != NULL){
 		strcat(cmdc, cmdf[i]);
