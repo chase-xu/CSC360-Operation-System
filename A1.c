@@ -173,24 +173,16 @@ int main(){
        	}
 
 		/*get command input*/
-        char* cmd = (char*)malloc(sizeof(char)*CMDSIZE);
+        //char* cmd = (char*)malloc(sizeof(char)*CMDSIZE);
 		//char argv[CMDSIZE];
 		//char** cmdf = (char**) malloc(sizeof(char));
+		char cmd[CMDSIZE];
 		char* cmdf[CMDSIZE];
 		
 		printf("string is: %s\n", cmd);
 		printf("%s", cmd);
-		//strtok(cmd, "\n");
 
-		/*tokenize input*/
-		// int j = 0;
-		// cmd[0]= strtok(argv,"\n");
-		// int i=0;
-		// while(cmd[i]!=NULL){
-		// 	cmd[i+1]=strtok(NULL,"\n");
-		// 	i++;
-		// 	j++;
-		// }			 
+		/*tokenize input*/			 
 		char* tok;
 		fgets(cmd, sizeof(cmd), stdin);
 		strtok(cmd, "\n");
@@ -203,7 +195,7 @@ int main(){
 			tok = strtok(NULL, " ");
 			j++;
 		}
-		//cmdf[1] = strtok(cmdf)
+		cmdf[1] = strtok(cmdf[1], " ");  //not sure why if the input has cd and + space, the space will remains. So I just use this line to delete the space;
 		printf("%d\n", i);
 		printf("3\n");
 		for(i = 0; i < j;i++){
@@ -212,7 +204,7 @@ int main(){
 		printf("\n");
 		printf("%s", cmdf[0]);
 		printf("\n");
-
+		//free(cmd);
 		/*exit cmd*/
 		if(strcmp(cmdf[0], "quit") == 0){
 			check_list();
@@ -297,7 +289,6 @@ int main(){
 				return 0;
 			}
 		}
-		free(cmd);
 	}
 	
 	return 0;
