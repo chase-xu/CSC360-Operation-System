@@ -17,6 +17,7 @@ typedef struct bg{
 	struct bg* next;
 	pid_t pid;
 	char* cmd;
+	int num;
 } bg;
 
 
@@ -29,8 +30,6 @@ void append(pid_t pid, char** cmdf){
 	char* cmdc = (char*) malloc(sizeof(char)*50);
 	int i = 0;
 	printf("cmd is %s\n", cmdf[0]);
-	
-	char* space = " ";
 	while(cmdf[i] != NULL){
 		strcat(cmdc, cmdf[i]);
 		strcat(cmdc, " ");
@@ -44,6 +43,7 @@ void append(pid_t pid, char** cmdf){
 	/*check if it is the first node*/
 	if(list == NULL){
 		list = curr;
+		curr->num = 1;
 		list->next = NULL;
 	}
 	else{
@@ -51,7 +51,9 @@ void append(pid_t pid, char** cmdf){
 		while(temp->next != NULL){
 			temp = temp->next;
 		}
+
 		temp->next = curr;
+		curr->num = temp->num + 1;
 		temp->next->next = NULL;
 	} 
 }
@@ -73,7 +75,8 @@ void printList(){
 	}
 	while(curr != NULL){
 		n++;
-		printf("%d: %s%d\n", curr->pid, curr->cmd, n);
+		printf("%d: %s%d\n", curr->pid, curr->cmd, curr->num);
+		strcat(curr->cmd, " ");
 		curr = curr->next;
 	}
 	printf("Total Background jobs: %d\n", n);
@@ -91,6 +94,11 @@ void delete(pid_t pid){
 
 	/*first one matched*/
 	else if(list->pid == pid){
+		bg* temp = list;
+		while(temp->next != NULL){
+			temp->num = temp->num - 1;
+			temp = temp->next;
+		}
 		list = list->next;
 		printf("%d: %s has terminated.\n", pid, prev->cmd);
 		free(prev->cmd);
@@ -101,8 +109,15 @@ void delete(pid_t pid){
 		while(curr != NULL){
 			/*case find the pid*/
 			if(curr->pid == pid){
+					bg* temp = curr->next;
+					int num = curr->num;
+					while(temp != NULL){
+						temp->num = num;
+						temp = temp->next;
+						num++;
+					}
 					prev->next = curr->next;
-					printf("%d: %s has terminated.\n", pid, curr->cmd);
+					printf("%d: %s %d has terminated.\n", pid, curr->cmd, curr->num);
 					free(curr->cmd);
 					free(curr);
 					break;
@@ -111,12 +126,20 @@ void delete(pid_t pid){
 			prev = curr;
 			curr = curr->next;
 		}
-		if(curr == NULL){
-			perror("not found pid\n");
-		}
 	}
 }
 
+void check_list(){
+	/*check if any child terminated*/
+	if(isEmpty() == 0){
+		pid_t pid = waitpid(0, NULL, WNOHANG);
+		while(pid > 0){
+			printf("in pid %d\n", pid);
+			delete(pid);			
+			pid = waitpid(0, NULL, WNOHANG);
+		}
+	}
+}
 
 int main(){
 	/*Get current path*/
@@ -150,25 +173,37 @@ int main(){
        	}
 
 		/*get command input*/
-        char cmd[CMDSIZE];
+        char* cmd = (char*)malloc(sizeof(char)*CMDSIZE);
+		//char argv[CMDSIZE];
 		//char** cmdf = (char**) malloc(sizeof(char));
 		char* cmdf[CMDSIZE];
-		char* tok;
-		fgets(cmd, sizeof(cmd), stdin);
-		printf("string is: %s", cmd);
+		
+		printf("string is: %s\n", cmd);
 		printf("%s", cmd);
-		strtok(cmd, "\n");
+		//strtok(cmd, "\n");
 
 		/*tokenize input*/
-		tok = strtok(cmd, " ");
-		printf("2\n");
+		// int j = 0;
+		// cmd[0]= strtok(argv,"\n");
+		// int i=0;
+		// while(cmd[i]!=NULL){
+		// 	cmd[i+1]=strtok(NULL,"\n");
+		// 	i++;
+		// 	j++;
+		// }			 
+		char* tok;
+		fgets(cmd, sizeof(cmd), stdin);
+		strtok(cmd, "\n");
+		printf("%s\n", cmd);
 		int i = 0;
 		int j = 0;
+		tok = strtok(cmd, " ");
 		while(tok != NULL){
 			cmdf[i++] = tok;
 			tok = strtok(NULL, " ");
 			j++;
 		}
+		//cmdf[1] = strtok(cmdf)
 		printf("%d\n", i);
 		printf("3\n");
 		for(i = 0; i < j;i++){
@@ -178,26 +213,21 @@ int main(){
 		printf("%s", cmdf[0]);
 		printf("\n");
 
-		/*check if any child terminated*/
-		if(isEmpty() == 0){
-			pid_t pid;
-			while(pid = waitpid(0, NULL, 1) > 0){
-				printf("in pid");
-				delete(pid);
-			}
-		}
 		/*exit cmd*/
 		if(strcmp(cmdf[0], "quit") == 0){
+			check_list();
 			exit(0);
 		}
 		/* directory cmd*/
 		else if(strcmp(cmdf[0], "cd") == 0){ 
+			check_list();
 			printf("enter cd\n");
-			printf("path is %s\n", cmdf[1]);
+			printf("path is%s grid\n", cmdf[1]);
 			if(cmdf[1] == NULL){
+
 				printf("find null \n");
 			}
-			if(cmdf[1] == NULL || strcmp(cmdf[1],"~") == 0){
+			if(cmdf[1] == NULL|| strcmp(cmdf[1],"~") == 0){
 				printf("enter path\n");
 				char dir[strlen(getenv("HOME"))];
 				if(getenv("HOME") != NULL){
@@ -214,7 +244,8 @@ int main(){
 		}
 		/*background command*/
 		else if(strcmp(cmdf[0], "bg") == 0){
-			
+			check_list();
+
 			/*abandon first cmd "bg"*/
 			char* cmdbg[CMDSIZE];
 			int i = 0;
@@ -246,6 +277,7 @@ int main(){
 			printList(cmdf);
 		}
 	    else {
+			check_list();
 			pid_t pid = fork();
 			/*in parent*/
 			if(pid > 0){ 
@@ -265,7 +297,8 @@ int main(){
 				return 0;
 			}
 		}
+		free(cmd);
 	}
-	//free(cmdf);
+	
 	return 0;
 }
